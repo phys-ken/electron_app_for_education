@@ -33,6 +33,9 @@
 .pt-cell:hover {
   background: #fde68a;
 }
+.pt-cell.cursor-not-allowed:hover {
+  background: #fefce8; /* 選択不可の場合はホバー効果なし */
+}
 .pt-selected {
   background: #fb923c;
   color: #fff;

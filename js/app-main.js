@@ -1,12 +1,11 @@
+/* ---------- Main Application for Index Page ---------- */
 (function() {
   const appRoot = document.getElementById('app');
 
-  // メインモードマッピング
+  // メインモードマッピング（解説モードのみ）
   const modes = {
     explain: renderExplain,
-    quiz: renderQuiz,
-    ion: renderIon,
-    ionquiz: renderIonQuiz
+    ion: renderIon
   };
   
   // モード切替関数

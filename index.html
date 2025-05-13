@@ -11,13 +11,17 @@
   <header class="py-4 text-center">
     <h1 class="text-2xl sm:text-3xl font-bold">電子配置を学ぼう！</h1>
   </header>
-  <nav class="container mx-auto flex flex-wrap gap-3 justify-center px-2 mb-6">
-    <button data-mode="explain" class="app-btn mode-btn">解説</button>
-    <button data-mode="quiz" class="app-btn mode-btn">電子配置クイズ</button>
+  
+  <!-- モード切替（上部から削除しシンプル化） -->
+  <div class="container mx-auto flex flex-wrap gap-3 justify-center px-2 mb-6">
+    <button data-mode="explain" class="app-btn mode-btn">電子配置解説</button>
     <button data-mode="ion" class="app-btn mode-btn">イオン解説</button>
-    <button data-mode="ionquiz" class="app-btn mode-btn">イオン・クイズ</button>
-  </nav>
+  </div>
+  
   <main id="app" class="container mx-auto px-3 pb-10"></main>
+  
+  <!-- クイズへのリンクを削除 -->
+  
   <footer class="text-center text-gray-500 text-sm py-4">
     <p>&copy; phys-ken</p>
     <p class="mt-1"><a href="https://note.com/phys_ken" target="_blank" class="text-blue-500 hover:underline">https://note.com/phys_ken</a></p>
@@ -26,6 +30,7 @@
   <script src="js/constants.js"></script>
   <script src="js/modes/utils.js"></script>
   <script src="js/modes/explain.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/modes/ion.js"></script>
+  <script src="js/app-main.js"></script>
 </body>
 </html>

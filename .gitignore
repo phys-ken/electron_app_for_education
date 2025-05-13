@@ -1,0 +1,35 @@
+# OS固有のファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# エディタ/IDE固有のファイル
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+*.sublime-*
+.history
+
+# ログファイル
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 一時ファイル
+tmp/
+temp/
+
+# キャッシュなど
+.cache/
+.vercel
+.env*.local
+
+# npm関連（開発環境で使用する場合）
+node_modules/
+package-lock.json
+yarn.lock
