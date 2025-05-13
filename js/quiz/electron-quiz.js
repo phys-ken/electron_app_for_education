@@ -1,5 +1,5 @@
 /**
- * 電子配置クイズ（改良版）
+ * 電子配置クイズ
  * 原子番号1〜20の中性原子の電子配置を学ぶためのクイズ
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -36,11 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
     /* 12.Mg */ [2, 8, 2, 0],
     /* 13.Al */ [2, 8, 3, 0],
     /* 14.Si */ [2, 8, 4, 0],
-    /* 15.P  */ [2, 8, 5, 0],
-    /* 16.S  */ [2, 8, 6, 0],
+    /* 15.P */ [2, 8, 5, 0],
+    /* 16.S */ [2, 8, 6, 0],
     /* 17.Cl */ [2, 8, 7, 0],
     /* 18.Ar */ [2, 8, 8, 0],
-    /* 19.K  */ [2, 8, 8, 1],
+    /* 19.K */ [2, 8, 8, 1],
     /* 20.Ca */ [2, 8, 8, 2]
   ];
   
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function getCorrectConfig(atomicNumber) {
     return CORRECT_ELECTRON_CONFIG[atomicNumber - 1];
   }
-  
+
   /**
    * クイズの開始画面をレンダリング
    */
@@ -58,24 +58,27 @@ document.addEventListener('DOMContentLoaded', function() {
     appRoot.innerHTML = '';
     
     const startScreen = document.createElement('div');
-    startScreen.className = 'text-center py-4 max-w-md mx-auto';
+    startScreen.className = 'text-center py-6 max-w-md mx-auto';
     
     startScreen.innerHTML = `
-      <h2 class="text-xl font-bold mb-6">電子配置クイズ</h2>
-      <p class="mb-4">正しい電子配置を作ってください！</p>
-      <div class="mb-6">
-        <p class="mb-2 font-medium">問題数を選んでください：</p>
+      <p class="text-lg mb-8">原子番号に対応する正しい電子配置を作成してください</p>
+      
+      <div class="mb-8">
+        <p class="mb-3 font-medium">問題数</p>
         <div class="flex justify-center gap-4">
-          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100" data-count="3">3問</button>
-          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100" data-count="5">5問</button>
-          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100" data-count="10">10問</button>
+          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100 transition" data-count="3">3問</button>
+          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100 transition" data-count="5">5問</button>
+          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100 transition" data-count="10">10問</button>
         </div>
       </div>
-      <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 mb-6 text-left">
-        <p class="font-medium mb-1">操作方法</p>
-        <p>・各殻（K, L, M, N）の数値を調整して電子配置を作ります</p>
-        <p>・原子番号が表示されるのでその元素の電子配置を作ってください</p>
-        <p>・準備ができたら「チェック」ボタンで採点します</p>
+      
+      <div class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 mb-6">
+        <p class="font-medium mb-2">操作方法</p>
+        <ul class="list-disc list-inside text-left space-y-1">
+          <li>各殻（K, L, M, N）の＋/−ボタンで電子数を調整</li>
+          <li>表示される原子番号の電子配置を作成</li>
+          <li>「チェック」ボタンで正誤を判定</li>
+        </ul>
       </div>
     `;
     
@@ -357,39 +360,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // クイズを一時停止
     quizState.isActive = false;
     
-    // 正解の電子配置を取得
+    // 模範解答を取得
     const correctConfig = getCorrectConfig(quizState.currentAtomicNumber);
     
-    // ユーザーの回答もディープコピー
-    const userAnswer = [...quizState.userElectrons];
+    // デバッグ情報をコンソールに出力
+    console.log('原子番号:', quizState.currentAtomicNumber);
+    console.log('正解の配置:', correctConfig);
+    console.log('ユーザーの回答:', quizState.userElectrons);
     
-    // デバッグ情報
-    console.log('問題の原子番号:', quizState.currentAtomicNumber);
-    console.log('正解の電子配置:', correctConfig);
-    console.log('ユーザーの回答:', userAnswer);
-    console.log('DOM上の電子表示:', Array.from(document.querySelectorAll('.shell-count')).map(el => el.textContent));
-    
-    // 単純比較（各殻ごとに比較）
+    // ユーザーの回答と比較
     let isCorrect = true;
     let feedback = '';
     
-    for (let i = 0; i < 4; i++) {
-      const correct = correctConfig[i] || 0;
-      const user = userAnswer[i] || 0;
-      
-      if (correct !== user) {
+    // 各殻の電子数を比較
+    for (let i = 0; i < shellNames.length; i++) {
+      // 電子数が一致しなければエラー
+      if (quizState.userElectrons[i] !== correctConfig[i]) {
         isCorrect = false;
-        const diff = user - correct;
-        
-        // 原子番号14に対してN殻の判定が正しいか特に確認
-        if (quizState.currentAtomicNumber === 14 && i === 3) {
-          console.log('原子番号14のN殻 - 正解:', correct, 'ユーザー:', user);
-        }
-        
-        if (diff > 0) {
-          feedback += `${shellNames[i]}が${diff}個多い `;
+        const diff = quizState.userElectrons[i] - correctConfig[i];
+        if (correctConfig[i] === 0 && quizState.userElectrons[i] > 0) {
+          // 使われない殻に電子が配置されている場合
+          feedback += `${shellNames[i]}には電子は不要ですが、${quizState.userElectrons[i]}個配置されています。 `;
         } else {
-          feedback += `${shellNames[i]}が${Math.abs(diff)}個少ない `;
+          // 通常の過不足
+          feedback += `${shellNames[i]}が${Math.abs(diff)}個${diff > 0 ? '多い' : '少ない'} `;
         }
       }
     }
@@ -449,8 +443,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="text-lg mb-6">
         正答率: ${Math.round((quizState.correct / quizState.total) * 100)}%
       </div>
-      <div class="flex justify-center">
-        <button id="restart-quiz" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md">もう一度プレイ</button>
+      <div>
+        <button id="restart-quiz" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md">
+          もう一度プレイ
+        </button>
       </div>
     `;
     

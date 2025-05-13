@@ -12,7 +12,7 @@
     <h1 class="text-2xl sm:text-3xl font-bold">電子配置を学ぼう！</h1>
   </header>
   
-  <!-- モード切替（上部から削除しシンプル化） -->
+  <!-- モード切替ボタン -->
   <div class="container mx-auto flex flex-wrap gap-3 justify-center px-2 mb-6">
     <button data-mode="explain" class="app-btn mode-btn">電子配置解説</button>
     <button data-mode="ion" class="app-btn mode-btn">イオン解説</button>
@@ -20,7 +20,18 @@
   
   <main id="app" class="container mx-auto px-3 pb-10"></main>
   
-  <!-- クイズへのリンクを削除 -->
+  <!-- ページ下部にクイズへのナビゲーション -->
+  <div class="container mx-auto mt-10 mb-6 text-center">
+    <h2 class="text-xl font-bold mb-4">クイズに挑戦</h2>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a href="quiz_electron.html" class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md">
+        電子配置クイズ
+      </a>
+      <a href="quiz_ion.html" class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md">
+        イオンクイズ
+      </a>
+    </div>
+  </div>
   
   <footer class="text-center text-gray-500 text-sm py-4">
     <p>&copy; phys-ken</p>

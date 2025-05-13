@@ -1,6 +1,5 @@
 /**
- * 電子配置クイズ（改良版）
- * 原子番号1〜20の中性原子の電子配置を学ぶためのクイズ
+ * イオンクイズ - 模範解答リストによる判定版
  */
 document.addEventListener('DOMContentLoaded', function() {
   // DOM要素
@@ -13,42 +12,66 @@ document.addEventListener('DOMContentLoaded', function() {
     correct: 0,       // 正解数
     isActive: false,  // クイズ実行中かどうか
     questions: [],    // 出題リスト
-    currentAtomicNumber: 0,  // 現在の問題の原子番号
+    currentIon: null, // 現在の問題のイオン
     userElectrons: [0, 0, 0, 0],  // ユーザーの回答（K, L, M, N殻）
   };
   
   // シェル名のリスト
   const shellNames = ['K殻', 'L殻', 'M殻', 'N殻'];
   
-  // 原子番号1～20の正確な電子配置（明示的な定義）
-  const CORRECT_ELECTRON_CONFIG = [
-    /* 1.H  */ [1, 0, 0, 0],
-    /* 2.He */ [2, 0, 0, 0],
-    /* 3.Li */ [2, 1, 0, 0],
-    /* 4.Be */ [2, 2, 0, 0],
-    /* 5.B  */ [2, 3, 0, 0],
-    /* 6.C  */ [2, 4, 0, 0],
-    /* 7.N  */ [2, 5, 0, 0],
-    /* 8.O  */ [2, 6, 0, 0],
-    /* 9.F  */ [2, 7, 0, 0],
-    /* 10.Ne */ [2, 8, 0, 0],
-    /* 11.Na */ [2, 8, 1, 0],
-    /* 12.Mg */ [2, 8, 2, 0],
-    /* 13.Al */ [2, 8, 3, 0],
-    /* 14.Si */ [2, 8, 4, 0],
-    /* 15.P */ [2, 8, 5, 0],
-    /* 16.S */ [2, 8, 6, 0],
-    /* 17.Cl */ [2, 8, 7, 0],
-    /* 18.Ar */ [2, 8, 8, 0],
-    /* 19.K */ [2, 8, 8, 1],
-    /* 20.Ca */ [2, 8, 8, 2]
+  // イオンリスト
+  const IONS = [
+    { z: 3, element: "Li", charge: 1, name: "リチウムイオン" },
+    { z: 9, element: "F", charge: -1, name: "フッ化物イオン" },
+    { z: 11, element: "Na", charge: 1, name: "ナトリウムイオン" },
+    { z: 12, element: "Mg", charge: 2, name: "マグネシウムイオン" },
+    { z: 13, element: "Al", charge: 3, name: "アルミニウムイオン" },
+    { z: 16, element: "S", charge: -2, name: "硫化物イオン" },
+    { z: 17, element: "Cl", charge: -1, name: "塩化物イオン" },
+    { z: 19, element: "K", charge: 1, name: "カリウムイオン" },
+    { z: 20, element: "Ca", charge: 2, name: "カルシウムイオン" },
+    { z: 8, element: "O", charge: -2, name: "酸化物イオン" }
   ];
   
+  // 各イオンの正しい電子配置の明示的な定義
+  const IONS_ELECTRON_CONFIG = {
+    // Li+: 電子数2
+    "Li/1": [2, 0, 0, 0],
+    
+    // F-: 電子数10
+    "F/-1": [2, 8, 0, 0],
+    
+    // Na+: 電子数10
+    "Na/1": [2, 8, 0, 0],
+    
+    // Mg2+: 電子数10
+    "Mg/2": [2, 8, 0, 0],
+    
+    // Al3+: 電子数10
+    "Al/3": [2, 8, 0, 0],
+    
+    // S2-: 電子数18
+    "S/-2": [2, 8, 8, 0],
+    
+    // Cl-: 電子数18
+    "Cl/-1": [2, 8, 8, 0],
+    
+    // K+: 電子数18
+    "K/1": [2, 8, 8, 0],
+    
+    // Ca2+: 電子数18
+    "Ca/2": [2, 8, 8, 0],
+    
+    // O2-: 電子数10
+    "O/-2": [2, 8, 0, 0]
+  };
+  
   /**
-   * 原子番号に対応する正しい電子配置を取得
+   * 指定されたイオンの正しい電子配置を取得
    */
-  function getCorrectConfig(atomicNumber) {
-    return CORRECT_ELECTRON_CONFIG[atomicNumber - 1];
+  function getCorrectIonConfig(ion) {
+    const key = `${ion.element}/${ion.charge}`;
+    return IONS_ELECTRON_CONFIG[key];
   }
   
   /**
@@ -58,24 +81,27 @@ document.addEventListener('DOMContentLoaded', function() {
     appRoot.innerHTML = '';
     
     const startScreen = document.createElement('div');
-    startScreen.className = 'text-center py-4 max-w-md mx-auto';
+    startScreen.className = 'text-center py-6 max-w-md mx-auto';
     
     startScreen.innerHTML = `
-      <h2 class="text-xl font-bold mb-6">電子配置クイズ</h2>
-      <p class="mb-4">正しい電子配置を作ってください！</p>
-      <div class="mb-6">
-        <p class="mb-2 font-medium">問題数を選んでください：</p>
+      <p class="text-lg mb-8">イオン式に対応する正しい電子配置を作成してください</p>
+      
+      <div class="mb-8">
+        <p class="mb-3 font-medium">問題数</p>
         <div class="flex justify-center gap-4">
-          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100" data-count="3">3問</button>
-          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100" data-count="5">5問</button>
-          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100" data-count="10">10問</button>
+          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100 transition" data-count="3">3問</button>
+          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100 transition" data-count="5">5問</button>
+          <button class="quiz-count-btn px-6 py-2 border rounded-lg bg-white hover:bg-blue-100 transition" data-count="10">10問</button>
         </div>
       </div>
-      <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 mb-6 text-left">
-        <p class="font-medium mb-1">操作方法</p>
-        <p>・各殻（K, L, M, N）の数値を調整して電子配置を作ります</p>
-        <p>・原子番号が表示されるのでその元素の電子配置を作ってください</p>
-        <p>・準備ができたら「チェック」ボタンで採点します</p>
+      
+      <div class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 mb-6">
+        <p class="font-medium mb-2">操作方法</p>
+        <ul class="list-disc list-inside text-left space-y-1">
+          <li>各殻（K, L, M, N）の＋/−ボタンで電子数を調整</li>
+          <li>表示されるイオン式（Na<sup>+</sup>など）に合わせて電子配置を作成</li>
+          <li>「チェック」ボタンで正誤を判定</li>
+        </ul>
       </div>
     `;
     
@@ -107,19 +133,27 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   /**
-   * 原子番号1-20からランダムに問題を生成
+   * イオンリストからランダムに問題を生成
    */
   function generateQuestions() {
     quizState.questions = [];
-    const availableElements = Array.from({length: 20}, (_, i) => i + 1); // 原子番号1-20
     
-    // ランダムに問題を選択
+    // 利用可能なイオンをコピー
+    const availableIons = [...IONS];
+    
+    // 必要な数だけランダムに選択
     for (let i = 0; i < quizState.total; i++) {
-      if (availableElements.length === 0) break;
+      if (availableIons.length === 0) break;
       
-      const randomIndex = Math.floor(Math.random() * availableElements.length);
-      const element = availableElements.splice(randomIndex, 1)[0];
-      quizState.questions.push(element);
+      const randomIndex = Math.floor(Math.random() * availableIons.length);
+      const ion = availableIons.splice(randomIndex, 1)[0];
+      quizState.questions.push(ion);
+    }
+    
+    // イオン数が足りなければ、再度選択してリストを埋める
+    while (quizState.questions.length < quizState.total) {
+      const randomIndex = Math.floor(Math.random() * IONS.length);
+      quizState.questions.push(IONS[randomIndex]);
     }
   }
   
@@ -139,8 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // ユーザーの回答をリセット
     quizState.userElectrons = [0, 0, 0, 0];
     
-    // 現在の問題の原子番号を取得
-    quizState.currentAtomicNumber = quizState.questions[quizState.current - 1];
+    // 現在の問題のイオン情報を取得
+    quizState.currentIon = quizState.questions[quizState.current - 1];
     
     // 問題画面を描画
     renderQuestionScreen();
@@ -169,10 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
       <div>正解: ${quizState.correct}</div>
     `;
     
-    // 原子情報
-    const atomInfo = document.createElement('div');
-    atomInfo.className = 'text-center mb-2';
-    atomInfo.innerHTML = `<span class="font-medium">原子番号: ${quizState.currentAtomicNumber}</span>`;
+    // イオン情報表示
+    const ionInfo = document.createElement('div');
+    ionInfo.className = 'text-center mb-4';
+    
+    const chargeText = quizState.currentIon.charge > 0 ? 
+      `<sup>${quizState.currentIon.charge > 1 ? quizState.currentIon.charge : ''}+</sup>` : 
+      `<sup>${Math.abs(quizState.currentIon.charge) > 1 ? Math.abs(quizState.currentIon.charge) : ''}−</sup>`;
+    
+    ionInfo.innerHTML = `
+      <div class="text-xl font-bold">${quizState.currentIon.element}${chargeText}</div>
+      <div class="text-sm text-gray-600">${quizState.currentIon.name}</div>
+    `;
     
     // キャンバスエリア
     const canvasArea = document.createElement('div');
@@ -180,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const canvas = makeCanvas();
     
-    // 電子数操作UI（すべての殻を操作可能に）
+    // 電子数操作UI
     const electronControls = document.createElement('div');
     electronControls.className = 'grid grid-cols-4 gap-2 mt-4 mb-4 max-w-md mx-auto';
     
@@ -266,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.font = 'bold 18px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(`+${quizState.currentAtomicNumber}`, centerX, centerY);
+      ctx.fillText(`+${quizState.currentIon.z}`, centerX, centerY);
       
       // 殻の描画（点線円）
       ctx.setLineDash([2, 3]);
@@ -322,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 要素を配置
     appRoot.appendChild(instructions);
     appRoot.appendChild(scoreDisplay);
-    appRoot.appendChild(atomInfo);
+    appRoot.appendChild(ionInfo);
     canvasArea.appendChild(canvas);
     appRoot.appendChild(canvasArea);
     appRoot.appendChild(electronControls);
@@ -341,30 +383,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // クイズを一時停止
     quizState.isActive = false;
     
-    // 模範解答を取得
-    const correctConfig = getCorrectConfig(quizState.currentAtomicNumber);
+    // 正解の電子配置を取得
+    const correctConfig = getCorrectIonConfig(quizState.currentIon);
     
-    // デバッグ情報をコンソールに出力
-    console.log('原子番号:', quizState.currentAtomicNumber);
+    // ユーザー入力と正解を明確に比較するために出力
+    console.log('イオン:', quizState.currentIon.element, quizState.currentIon.charge);
     console.log('正解の配置:', correctConfig);
     console.log('ユーザーの回答:', quizState.userElectrons);
     
-    // ユーザーの回答と比較
+    // 正規化された配列で比較
     let isCorrect = true;
     let feedback = '';
     
     // 各殻の電子数を比較
-    for (let i = 0; i < shellNames.length; i++) {
-      // 電子数が一致しなければエラー
-      if (quizState.userElectrons[i] !== correctConfig[i]) {
+    for (let i = 0; i < correctConfig.length; i++) {
+      if (correctConfig[i] !== quizState.userElectrons[i]) {
         isCorrect = false;
         const diff = quizState.userElectrons[i] - correctConfig[i];
-        if (correctConfig[i] === 0 && quizState.userElectrons[i] > 0) {
-          // 使われない殻に電子が配置されている場合
-          feedback += `${shellNames[i]}には電子は不要ですが、${quizState.userElectrons[i]}個配置されています。 `;
+        
+        // シェル名の配列の範囲をチェック
+        const shellName = i < shellNames.length ? shellNames[i] : `殻${i+1}`;
+        
+        if (diff > 0) {
+          feedback += `${shellName}が${diff}個多い `;
         } else {
-          // 通常の過不足
-          feedback += `${shellNames[i]}が${Math.abs(diff)}個${diff > 0 ? '多い' : '少ない'} `;
+          feedback += `${shellName}が${Math.abs(diff)}個少ない `;
         }
       }
     }
