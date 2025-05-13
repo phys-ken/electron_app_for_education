@@ -34,6 +34,7 @@ const renderExplain = () => {
           num.value = z;
           drawAtom(canvas, z);
           highlight(pt, z);
+          updateShellInfo(z);
         };
       } else {
         cell.classList.add('bg-transparent', 'border-0');
@@ -61,11 +62,30 @@ const renderExplain = () => {
   num.value = z;
   num.className = 'w-16 text-center border px-1 py-0.5';
   
+  // 殻情報を表示するエリア - よりコンパクトなデザイン
+  const shellInfo = document.createElement('div');
+  shellInfo.id = 'shell-info';
+  shellInfo.className = 'text-center my-2 text-sm';
+  
+  // 殻情報を更新する関数 - 元素記号と原子番号を表示しない
+  const updateShellInfo = (z) => {
+    const conf = configForZ(z);
+    const shellNames = ['K殻', 'L殻', 'M殻', 'N殻'];
+    
+    // 殻情報のみを横一列の形式で表示
+    const shellTexts = conf
+      .map((electrons, i) => electrons > 0 ? `${shellNames[i]}:${electrons}個` : null)
+      .filter(text => text !== null);
+    
+    shellInfo.innerHTML = shellTexts.join('、 ');
+  };
+  
   btnM.onclick = () => {
     z = Math.max(1, z-1);
     num.value = z;
     drawAtom(canvas, z);
     highlight(pt, z);
+    updateShellInfo(z);
   };
   
   btnP.onclick = () => {
@@ -73,17 +93,20 @@ const renderExplain = () => {
     num.value = z;
     drawAtom(canvas, z);
     highlight(pt, z);
+    updateShellInfo(z);
   };
   
   num.onchange = () => {
     z = Math.max(1, Math.min(20, parseInt(num.value)));
     drawAtom(canvas, z);
     highlight(pt, z);
+    updateShellInfo(z);
   };
   
   controls.append(btnM, num, btnP);
   const canvas = makeCanvas();
-  appRoot.append(pt, controls, canvas);
+  appRoot.append(pt, controls, shellInfo, canvas);
   drawAtom(canvas, z);
   highlight(pt, z);
+  updateShellInfo(z);
 };
