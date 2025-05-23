@@ -11,7 +11,36 @@
 
 /* -------- Buttons -------- */
 .app-btn {
-  @apply flex-1 min-w-[40%] sm:min-w-fit px-3 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition shadow text-sm sm:text-base whitespace-nowrap;
+  flex: 1;
+  min-width: 40%;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  background-color: #2563eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition-property: background-color, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.app-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.app-btn:active {
+  transform: scale(0.95);
+}
+
+@media (min-width: 640px) {
+  .app-btn {
+    min-width: fit-content;
+    font-size: 1rem;
+  }
 }
 
 /* -------- Periodic Table (1–20) -------- */
