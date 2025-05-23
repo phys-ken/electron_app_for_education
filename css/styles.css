@@ -104,6 +104,7 @@
 .info-icon {
   font-size: 0.8rem;
   cursor: help;
+  vertical-align: super;
 }
 
 .info-icon.warn {
@@ -114,21 +115,22 @@
 .tooltip-container {
   position: relative;
   display: inline-flex;
-  vertical-align: super;
+  vertical-align: middle;
   margin-left: 2px;
 }
 
 .tooltip-container:hover::after {
   content: attr(title);
   position: absolute;
-  bottom: 100%;
+  bottom: 120%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(55, 65, 81, 0.9);
+  background-color: rgba(55, 65, 81, 0.95);
   color: white;
-  padding: 0.3rem 0.6rem;
+  padding: 0.35rem 0.7rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
   white-space: nowrap;
   z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }

@@ -139,13 +139,13 @@ const renderIon = () => {
         const chargeText = charge > 1 ? charge : '';
         ionSymbolDisplay.innerHTML = `${el[1]}<sup>${chargeText}+</sup>`;
         
-        // 安定イオン判定とツールチップテキスト設定
-        if ((el[0] === 1) || // H+
-            (el[0] === 3) || // Li+
-            (el[0] === 11) || // Na+
-            (el[0] === 19) || // K+
-            (el[0] === 4 && charge === 2) || // Be2+ 追加
-            (el[0] === 5 && charge === 3) || // B3+ 追加
+        // 安定イオン判定とツールチップテキスト設定 - 明確な条件リスト
+        if ((el[0] === 1 && charge === 1) || // H+
+            (el[0] === 3 && charge === 1) || // Li+
+            (el[0] === 11 && charge === 1) || // Na+
+            (el[0] === 19 && charge === 1) || // K+
+            (el[0] === 4 && charge === 2) || // Be2+
+            (el[0] === 5 && charge === 3) || // B3+
             (el[0] === 12 && charge === 2) || // Mg2+
             (el[0] === 20 && charge === 2) || // Ca2+
             (el[0] === 13 && charge === 3)) { // Al3+
@@ -161,9 +161,9 @@ const renderIon = () => {
         const chargeText = absCharge > 1 ? absCharge : '';
         ionSymbolDisplay.innerHTML = `${el[1]}<sup>${chargeText}−</sup>`;
         
-        // 安定イオン判定とツールチップテキスト設定
-        if ((el[0] === 9) || // F-
-            (el[0] === 17) || // Cl-
+        // 陰イオンも明確な条件リストでチェック
+        if ((el[0] === 9 && charge === -1) || // F-
+            (el[0] === 17 && charge === -1) || // Cl-
             (el[0] === 8 && charge === -2) || // O2-
             (el[0] === 16 && charge === -2)) { // S2-
           tooltipText = `${Math.abs(charge)}価の陰イオンです`;
