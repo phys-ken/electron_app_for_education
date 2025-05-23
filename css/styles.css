@@ -70,3 +70,36 @@
     gap: 0.1rem;
   }
 }
+
+/* イオン情報アイコンのスタイル */
+.info-icon {
+  font-size: 0.8rem;
+  cursor: help;
+}
+
+.info-icon.warn {
+  color: #f59e0b;
+}
+
+/* ツールチップ用コンテナ */
+.tooltip-container {
+  position: relative;
+  display: inline-flex;
+  vertical-align: super;
+  margin-left: 2px;
+}
+
+.tooltip-container:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(55, 65, 81, 0.9);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
+}

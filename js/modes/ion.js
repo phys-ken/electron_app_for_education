@@ -65,7 +65,7 @@ const renderIon = () => {
   eMinusBtn.className = 'px-3 py-1 border rounded bg-blue-200 hover:bg-blue-300';
   
   const ionSymbolDisplay = document.createElement('div');
-  ionSymbolDisplay.className = 'w-24 text-center font-bold text-lg';
+  ionSymbolDisplay.className = 'w-24 text-center font-bold text-lg flex items-center justify-center';
   
   const ePlusBtn = document.createElement('button');
   ePlusBtn.textContent = '+ 電子';
@@ -128,14 +128,65 @@ const renderIon = () => {
     
     // イオン式の表示更新
     if (charge === 0) {
-      // 「中性」ではなく元素記号を表示
+      // 中性原子の場合は単に元素記号を表示
       ionSymbolDisplay.innerHTML = `${el[1]}`;
-    } else if (charge > 0) {
-      // 陽イオン (Na+, Mg2+ 等)
-      ionSymbolDisplay.innerHTML = `${el[1]}<sup>${charge > 1 ? charge : ''}+</sup>`;
     } else {
-      // 陰イオン (F-, O2- 等)
-      ionSymbolDisplay.innerHTML = `${el[1]}<sup>${Math.abs(charge) > 1 ? Math.abs(charge) : ''}−</sup>`;
+      let infoIcon = '';
+      let tooltipText = '';
+      
+      if (charge > 0) {
+        // 陽イオン (Na+, Mg2+ 等)
+        const chargeText = charge > 1 ? charge : '';
+        ionSymbolDisplay.innerHTML = `${el[1]}<sup>${chargeText}+</sup>`;
+        
+        // 安定イオン判定とツールチップテキスト設定
+        if ((el[0] === 1) || // H+
+            (el[0] === 3) || // Li+
+            (el[0] === 11) || // Na+
+            (el[0] === 19) || // K+
+            (el[0] === 4 && charge === 2) || // Be2+ 追加
+            (el[0] === 5 && charge === 3) || // B3+ 追加
+            (el[0] === 12 && charge === 2) || // Mg2+
+            (el[0] === 20 && charge === 2) || // Ca2+
+            (el[0] === 13 && charge === 3)) { // Al3+
+          tooltipText = `${charge}価の陽イオンです`;
+          infoIcon = '<span class="info-icon">ℹ️</span>';
+        } else {
+          tooltipText = '高校の学習では扱いません。安定して存在しません。';
+          infoIcon = '<span class="info-icon warn">⚠️</span>';
+        }
+      } else {
+        // 陰イオン (F-, O2- 等)
+        const absCharge = Math.abs(charge);
+        const chargeText = absCharge > 1 ? absCharge : '';
+        ionSymbolDisplay.innerHTML = `${el[1]}<sup>${chargeText}−</sup>`;
+        
+        // 安定イオン判定とツールチップテキスト設定
+        if ((el[0] === 9) || // F-
+            (el[0] === 17) || // Cl-
+            (el[0] === 8 && charge === -2) || // O2-
+            (el[0] === 16 && charge === -2)) { // S2-
+          tooltipText = `${Math.abs(charge)}価の陰イオンです`;
+          infoIcon = '<span class="info-icon">ℹ️</span>';
+        } else {
+          tooltipText = '高校の学習では扱いません。安定して存在しません。';
+          infoIcon = '<span class="info-icon warn">⚠️</span>';
+        }
+      }
+      
+      // ツールチップを持つアイコン要素を追加
+      const iconElement = document.createElement('span');
+      iconElement.className = 'ml-1 tooltip-container';
+      iconElement.innerHTML = infoIcon;
+      iconElement.setAttribute('title', tooltipText);
+      
+      // 既存の内容を保持しつつアイコンを追加
+      const existingContent = ionSymbolDisplay.innerHTML;
+      ionSymbolDisplay.innerHTML = '';
+      const textSpan = document.createElement('span');
+      textSpan.innerHTML = existingContent;
+      ionSymbolDisplay.appendChild(textSpan);
+      ionSymbolDisplay.appendChild(iconElement);
     }
     
     // 電子配置の計算
